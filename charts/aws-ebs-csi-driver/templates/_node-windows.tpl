@@ -130,9 +130,8 @@ spec:
               containerPort: 9808
               protocol: TCP
           livenessProbe:
-            httpGet:
-              path: /healthz
-              port: healthz
+            grpc:
+              port: 9808 #Unlike HTTP or TCP probes, you cannot specify the health check port by name, and you cannot configure a custom hostname.
             initialDelaySeconds: 10
             timeoutSeconds: 3
             periodSeconds: 10
