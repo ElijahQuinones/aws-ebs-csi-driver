@@ -225,7 +225,7 @@ spec:
             - --worker-threads=100
             {{- end }}
             {{- if not (regexMatch "(-retry-interval-start)" (join " " .Values.sidecars.provisioner.additionalArgs)) }}
-            - --retry-interval-start=8s
+            - --retry-interval-start=4s
             {{- end }}
             {{- if not (regexMatch "(-retry-interval-max)" (join " " .Values.sidecars.provisioner.additionalArgs)) }}
             - --retry-interval-max=30m
@@ -285,6 +285,9 @@ spec:
             - --kube-api-qps=20
             - --kube-api-burst=100
             - --worker-threads=100
+            {{- end }}
+            {{- if not (regexMatch "(-retry-interval-start)" (join " " .Values.sidecars.attacher.additionalArgs)) }}
+            - --retry-interval-start=0.5s
             {{- end }}
             {{- if not (regexMatch "(-retry-interval-max)" (join " " .Values.sidecars.attacher.additionalArgs)) }}
             - --retry-interval-max=5m
