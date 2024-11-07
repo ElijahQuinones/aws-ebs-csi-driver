@@ -17,8 +17,11 @@ spec:
     featureGates:
       VolumeAttributesClass: "true"
     runtimeConfig:
-      storage.k8s.io/v1alpha1: "true"
+      storage.k8s.io/v1beta1: "true"
   kubeControllerManager:
+    featureGates:
+      VolumeAttributesClass: "true"
+  kubeScheduler:
     featureGates:
       VolumeAttributesClass: "true"
   additionalPolicies:

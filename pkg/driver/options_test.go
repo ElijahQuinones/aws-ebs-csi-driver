@@ -74,11 +74,15 @@ func TestAddFlags(t *testing.T) {
 		t.Errorf("error setting legacy-xfs: %v", err)
 	}
 
+	if err := f.Set("csi-mount-point-prefix", "/var/lib/kubelet"); err != nil {
+		t.Errorf("error setting csi-mount-point-prefix: %v", err)
+	}
+
 	if o.Endpoint != "custom-endpoint" {
 		t.Errorf("unexpected Endpoint: got %s, want custom-endpoint", o.Endpoint)
 	}
-	if o.HttpEndpoint != ":8080" {
-		t.Errorf("unexpected HttpEndpoint: got %s, want :8080", o.HttpEndpoint)
+	if o.HTTPEndpoint != ":8080" {
+		t.Errorf("unexpected HTTPEndpoint: got %s, want :8080", o.HTTPEndpoint)
 	}
 	if !o.EnableOtelTracing {
 		t.Error("unexpected EnableOtelTracing: got false, want true")
@@ -215,7 +219,7 @@ func TestValidateMetricsHTTPS(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			o := &Options{
 				Mode:            ControllerMode,
-				HttpEndpoint:    tt.httpEndpoint,
+				HTTPEndpoint:    tt.httpEndpoint,
 				MetricsCertFile: tt.metricsCertFile,
 				MetricsKeyFile:  tt.metricsKeyFile,
 			}
