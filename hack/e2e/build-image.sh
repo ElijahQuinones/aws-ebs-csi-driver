@@ -68,6 +68,17 @@ function build_and_push() {
     export ALL_ARCH_linux="${IMAGE_ARCH}"
   fi
 
+  PUSH_TYPE="sub-push"
+
+  if [[ "$INSTANCE_TYPE" == "a1.large" ]]; then
+    PUSH_TYPE="sub-push-a1compat"
+  fi
+  if [[ "${FIPS_TEST}" == "true" ]]; then
+    PUSH_TYPE="sub-push-fips"
+  fi
+
+  make -j $(nproc) ${PUSH_TYPE}
+
   if [[ "${FIPS_TEST}" == "true" ]]; then
     make -j $(nproc) sub-push-fips
   else
