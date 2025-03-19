@@ -67,8 +67,14 @@ function build_and_push() {
     export ALL_OS="linux"
     export ALL_ARCH_linux="${IMAGE_ARCH}"
   fi
-  make -j $(nproc) sub-push
 
+  if [[ "${FIPS_TEST}" == "true" ]]; then
+    make -j $(nproc) sub-push-fips
+  else
+    make -j $(nproc) sub-push
+  fi
+
+  make -j $(nproc) ${PUSH_TYPE}
   loudecho "Image pushed to ${IMAGE_NAME}:${IMAGE_TAG}"
 }
 

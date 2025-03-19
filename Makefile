@@ -143,11 +143,6 @@ e2e/external: bin/helm bin/kubetest2
 	COLLECT_METRICS="true" \
 	./hack/e2e/run.sh
 
-.PHONY: e2e/external-a1
-e2e/external-a1: bin/helm bin/kubetest2
-	HELM_EXTRA_FLAGS="--set=a1CompatibilityDaemonSet=true" \
-	./hack/e2e/run.sh
-
 .PHONY: e2e/external-fips
 e2e/external-fips: bin/helm bin/kubetest2
 	HELM_EXTRA_FLAGS="--set=fips=true" \
@@ -167,7 +162,7 @@ e2e/external-windows-fips: bin/helm bin/kubetest2
 	GINKGO_SKIP=$(GINKGO_WINDOWS_SKIP) \
 	GINKGO_PARALLEL=15 \
 	EBS_INSTALL_SNAPSHOT="false" \
-	HELM_EXTRA_FLAGS="--set=fips=true"
+	HELM_EXTRA_FLAGS="--set=fips=true" \
 	./hack/e2e/run.sh
 
 .PHONY: e2e/external-windows-hostprocess

@@ -32,12 +32,9 @@ test-e2e-multi-az)
 test-e2e-external)
   TEST="external"
   ;;
-test-e2e-external-a1)
-  TEST="external-a1"
-  export INSTANCE_TYPE="a1.large"
-  ;;
 test-e2e-external-fips)
   TEST="external-fips"
+  export FIPS_TEST="true"
   ;;
 test-e2e-external-arm64)
   TEST="external"
@@ -56,6 +53,7 @@ test-e2e-external-eks-windows)
   ;;
 test-e2e-external-eks-windows-fips)
   TEST="external-windows-fips"
+  export FIPS_TEST="true"
   export CLUSTER_TYPE="eksctl"
   export WINDOWS="true"
   ;;
