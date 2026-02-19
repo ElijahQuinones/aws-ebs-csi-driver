@@ -4610,10 +4610,10 @@ func TestIsVolumeInitialized(t *testing.T) {
 		VolumeStatus: &types.VolumeStatusInfo{
 			Details: []types.VolumeStatusDetails{{
 				Name:   types.VolumeStatusNameInitializationState,
-				Status: ptr.String("completed"),
+				Status: new("completed"),
 			}},
 		},
-		VolumeId: ptr.String(volID),
+		VolumeId: new(volID),
 	}
 	volumeStatusInitializingNoEta := types.VolumeStatusItem{
 		InitializationStatusDetails: &types.InitializationStatusDetails{
@@ -4624,10 +4624,10 @@ func TestIsVolumeInitialized(t *testing.T) {
 		VolumeStatus: &types.VolumeStatusInfo{
 			Details: []types.VolumeStatusDetails{{
 				Name:   types.VolumeStatusNameInitializationState,
-				Status: ptr.String("initializing"),
+				Status: new("initializing"),
 			}},
 		},
-		VolumeId: ptr.String(volID),
+		VolumeId: new(volID),
 	}
 	volumeStatusInitializingYesEta := volumeStatusInitializingNoEta
 	volumeStatusInitializingYesEta.InitializationStatusDetails = &types.InitializationStatusDetails{
@@ -4688,10 +4688,10 @@ func TestIsVolumeInitialized(t *testing.T) {
 				VolumeStatus: &types.VolumeStatusInfo{
 					Details: []types.VolumeStatusDetails{{
 						Name:   types.VolumeStatusNameIoPerformance,
-						Status: ptr.String("test-value"),
+						Status: new("test-value"),
 					}},
 				},
-				VolumeId: ptr.String(volID),
+				VolumeId: new(volID),
 			},
 		},
 	}
