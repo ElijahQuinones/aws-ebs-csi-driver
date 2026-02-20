@@ -206,7 +206,7 @@ func getNextCardIndex(instanceType string, cardCounts map[int32]int) *int32 {
 
 	// Initialize card counts for all cards (ensure all cards are represented)
 	for i := range numCards {
-		cardIndex := int32(i) //nolint:gosec // numCards is always small (from ebsCardCounts table)
+		cardIndex := int32(i)
 		if _, exists := cardCounts[cardIndex]; !exists {
 			cardCounts[cardIndex] = 0
 		}

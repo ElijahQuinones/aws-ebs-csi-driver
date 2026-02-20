@@ -70,7 +70,7 @@ func DefaultKubernetesAPIClient(kubeconfig string) KubernetesAPIClient {
 					tokenFile := filepath.Join(sandboxMountPoint, "var", "run", "secrets", "kubernetes.io", "serviceaccount", "token")
 					rootCAFile := filepath.Join(sandboxMountPoint, "var", "run", "secrets", "kubernetes.io", "serviceaccount", "ca.crt")
 
-					token, tokenErr := os.ReadFile(tokenFile)
+					token, tokenErr := os.ReadFile(tokenFile) // #nosec G703 -- tokenFile is built via filepath.Join with controlled path components
 					if tokenErr != nil {
 						return nil, tokenErr
 					}

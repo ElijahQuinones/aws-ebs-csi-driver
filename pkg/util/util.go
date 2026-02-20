@@ -147,7 +147,7 @@ func ParseEndpoint(endpoint string, hostprocess bool) (string, string, error) {
 	case "tcp":
 	case "unix":
 		addr = filepath.Join("/", addr)
-		if err := os.Remove(addr); err != nil && !os.IsNotExist(err) {
+		if err := os.Remove(addr); err != nil && !os.IsNotExist(err) { // #nosec G703 -- addr is derived from a parsed URL path, not direct user input
 			return "", "", fmt.Errorf("could not remove unix domain socket %q: %w", addr, err)
 		}
 	default:
