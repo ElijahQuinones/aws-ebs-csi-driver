@@ -138,16 +138,62 @@ else
     set -x
     set +e
     # kubetest2 looks for deployers/testers in $PATH
-    PATH="${BIN}:${PATH}" "${BIN}/kubetest2" noop \
-      --run-id="e2e-kubernetes" \
-      --test=ginkgo \
-      -- \
-      --skip-regex="${GINKGO_SKIP}" \
-      --focus-regex="${GINKGO_FOCUS}" \
-      --test-package-version=$(curl -L https://dl.k8s.io/release/stable-${packageVersion}.txt) \
-      --parallel=${GINKGO_PARALLEL} \
-      --test-args="-storage.testdriver=${PWD}/manifests.yaml -kubeconfig=${KUBECONFIG} -node-os-distro=${NODE_OS_DISTRO}"
-    TEST_PASSED=$?
+
+    # Regex matching volume expansion tests susceptible to transient failures on Windows due to defragsvc contention.
+    WINDOWS_VOLUME_EXPAND_REGEX="volume-expand|expansion of pvcs created for ephemeral"
+
+    TEST_PACKAGE_VERSION=$(curl -L https://dl.k8s.io/release/stable-${packageVersion}.txt)
+
+    run_kubetest2() {
+      local run_id="$1"
+      local skip="$2"
+      local focus="$3"
+      local extra_ginkgo_args="${4:-}"
+
+      PATH="${BIN}:${PATH}" "${BIN}/kubetest2" noop \
+        --run-id="${run_id}" \
+        --test=ginkgo \
+        -- \
+        --skip-regex="${skip}" \
+        --focus-regex="${focus}" \
+        --test-package-version="${TEST_PACKAGE_VERSION}" \
+        --parallel=${GINKGO_PARALLEL} \
+        ${extra_ginkgo_args:+--ginkgo-args="${extra_ginkgo_args}"} \
+        --test-args="-storage.testdriver=${PWD}/manifests.yaml -kubeconfig=${KUBECONFIG} -node-os-distro=${NODE_OS_DISTRO}"
+    }
+
+    if [[ "${WINDOWS}" == true ]]; then
+      # Pass 1: Run all tests except volume-expand (no retries).
+      loudecho "Running non-volume-expand tests (no retries)"
+      run_kubetest2 "e2e-kubernetes" \
+        "${GINKGO_SKIP}|${WINDOWS_VOLUME_EXPAND_REGEX}" \
+        "${GINKGO_FOCUS}"
+      TEST_PASSED=$?
+
+      # Preserve Pass 1 JUnit results before Pass 2 overwrites them.
+      # kubetest2 writes JUnit XML to $ARTIFACTS (or ./_artifacts if unset).
+      _JUNIT_DIR="${ARTIFACTS:-_artifacts}"
+      for f in "${_JUNIT_DIR}"/junit*.xml; do
+        [ -f "$f" ] && mv "$f" "${f%.xml}_main.xml"
+      done
+
+      # Pass 2: Run only volume-expand tests with flake retries to tolerate
+      # transient defragsvc contention on Windows (StorageWMI error 4).
+      loudecho "Running volume-expand tests (with flake retries)"
+      run_kubetest2 "e2e-kubernetes-volume-expand" \
+        "${GINKGO_SKIP}" \
+        "${GINKGO_FOCUS}.*(${WINDOWS_VOLUME_EXPAND_REGEX})" \
+        "--flake-attempts=2"
+      VOLUME_EXPAND_PASSED=$?
+
+      if [[ ${VOLUME_EXPAND_PASSED} -ne 0 ]]; then
+        loudecho "WARNING: Volume expansion tests failed."
+        TEST_PASSED=1
+      fi
+    else
+      run_kubetest2 "e2e-kubernetes" "${GINKGO_SKIP}" "${GINKGO_FOCUS}"
+      TEST_PASSED=$?
+    fi
     set -e
     set +x
     popd
